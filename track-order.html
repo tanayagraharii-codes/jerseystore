@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track your order — Matchday Kits</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .track-wrap { max-width: 480px; margin: 60px auto; padding: 0 24px; }
+  .track-wrap h1 { font-family: 'Anton', sans-serif; text-transform: uppercase; font-size: 28px; margin-bottom: 8px; }
+  .track-wrap p.lead { color: #B9C9C0; margin-bottom: 24px; font-size: 14px; }
+  .track-form { display: flex; flex-direction: column; gap: 10px; }
+  .track-form input {
+    background: var(--pitch); border: 1px solid var(--line); color: var(--chalk);
+    padding: 10px; border-radius: var(--radius); font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .track-form input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+  #track-error { color: var(--danger); font-size: 13px; display: none; }
+  #track-result {
+    margin-top: 24px; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px; display: none;
+  }
+  #track-result .status-line { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  #track-result .badge { font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 4px 10px; border-radius: 3px; text-transform: uppercase; }
+  #track-result .badge.pending { background: #4a3a20; color: #E3A93E; }
+  #track-result .badge.paid { background: #204a2f; color: #5fd88a; }
+  #track-result .badge.cod { background: #2a3a4a; color: #7ab8e3; }
+  #track-result .badge.fulfilled { background: #1f3a35; color: #8ea296; }
+  #track-result .badge.cancelled { background: #4a2020; color: #d87a7a; }
+  #track-result ul { list-style: none; padding: 0; margin: 12px 0 0; font-size: 13px; color: #B9C9C0; }
+  #track-result li { padding: 4px 0; border-bottom: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<header class="site"><div class="bar"><a href="/" class="wordmark">MATCHDAY<span>KITS</span></a></div></header>
+
+<div class="track-wrap">
+  <h1>Track your order</h1>
+  <p class="lead">Enter your order ID (from your confirmation page) and the email you used at checkout.</p>
+  <form class="track-form" id="track-form">
+    <div id="track-error"></div>
+    <input type="text" id="t-order" placeholder="Order ID" required>
+    <input type="email" id="t-email" placeholder="Email used at checkout" required>
+    <button type="submit" class="add-btn">Track order</button>
+  </form>
+
+  <div id="track-result">
+    <div class="status-line">
+      <strong>Status</strong>
+      <span class="badge" id="t-status"></span>
+    </div>
+    <div>Total: <strong id="t-total"></strong></div>
+    <div>Payment: <span id="t-payment"></span></div>
+    <div>Placed: <span id="t-date"></span></div>
+    <ul id="t-items"></ul>
+  </div>
+</div>
+
+<script>
+const STATUS_LABELS = {
+  pending: 'Awaiting payment',
+  paid: 'Paid — preparing your order',
+  cod: 'Confirmed — pay on delivery',
+  fulfilled: 'Shipped / delivered',
+  cancelled: 'Cancelled'
+};
+
+document.getElementById('track-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('track-error');
+  errEl.style.display = 'none';
+  document.getElementById('track-result').style.display = 'none';
+
+  const orderId = document.getElementById('t-order').value.trim();
+  const email = document.getElementById('t-email').value.trim();
+
+  try {
+    const res = await fetch(`/api/track?orderId=${encodeURIComponent(orderId)}&email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.error || 'Could not find that order.';
+      errEl.style.display = 'block';
+      return;
+    }
+    document.getElementById('t-status').textContent = STATUS_LABELS[data.status] || data.status;
+    document.getElementById('t-status').className = 'badge ' + data.status;
+    document.getElementById('t-total').textContent = `₹${data.total.toFixed(2)}`;
+    document.getElementById('t-payment').textContent = data.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid online';
+    document.getElementById('t-date').textContent = new Date(data.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('t-items').innerHTML = data.items.map(i =>
+      `<li>${i.qty}× Size ${i.size}${i.customName ? ` — ${i.customName} #${i.customNumber}` : ''}</li>`
+    ).join('');
+    document.getElementById('track-result').style.display = 'block';
+  } catch (err) {
+    errEl.textContent = 'Network error. Please try again.';
+    errEl.style.display = 'block';
+  }
+});
+
+// If arriving from the order confirmation page, prefill and auto-search.
+const prefillParams = new URLSearchParams(window.location.search);
+const prefillOrder = prefillParams.get('prefillOrder');
+const prefillEmail = prefillParams.get('prefillEmail');
+if (prefillOrder && prefillEmail) {
+  document.getElementById('t-order').value = prefillOrder;
+  document.getElementById('t-email').value = prefillEmail;
+  document.getElementById('track-form').requestSubmit();
+}
+</script>
+</body>
+</html>

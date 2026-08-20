@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matchday Kits — Football Jerseys</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<div class="announce-bar">⚠️ Beware of scam calls — we never ask for payment over phone/WhatsApp &nbsp;·&nbsp; Cash on Delivery &amp; Prepaid available &nbsp;·&nbsp; Name &amp; number customization on select kits</div>
+
+<header class="site">
+  <div class="bar">
+    <a href="/" class="wordmark">MATCHDAY<span>KITS</span></a>
+    <a href="/track-order.html" class="track-link">Track Order</a>
+    <button id="cart-toggle">CART (<span id="cart-count">0</span>)</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-number">9</div>
+  <div class="wrap">
+    <h1>Wear the shirt. Own the moment.</h1>
+    <p>Official-style club kits, true to fit, shipped from stock — no preorders, no waiting for the next drop.</p>
+  </div>
+</section>
+
+<div class="trust-row">
+  <div class="wrap trust-grid">
+    <div class="trust-item"><span class="trust-icon">🚚</span> Free shipping on prepaid orders</div>
+    <div class="trust-item"><span class="trust-icon">✓</span> 100% quality checked before dispatch</div>
+    <div class="trust-item"><span class="trust-icon">₹</span> Cash on Delivery available</div>
+    <div class="trust-item"><span class="trust-icon">✎</span> Name &amp; number customization</div>
+  </div>
+</div>
+
+<div class="category-tabs" id="category-tabs"></div>
+<div class="filters" id="filters"></div>
+<div class="grid" id="grid"></div>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-col">
+      <div class="wordmark" style="font-size:20px;margin-bottom:12px;">MATCHDAY<span>KITS</span></div>
+      <p class="footer-note">Official-style club kits shipped from stock across India. Cash on Delivery and prepaid orders both accepted.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop by</h4>
+      <ul>
+        <li><a href="#" data-cat="new-season">New Season</a></li>
+        <li><a href="#" data-cat="retro">Retro Jerseys</a></li>
+        <li><a href="#" data-cat="customized">Customized</a></li>
+        <li><a href="#" data-cat="sale">Clearance Sale</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="/track-order.html">Track your order</a></li>
+        <li>Sizing help — message us on Instagram</li>
+        <li>Returns accepted within 7 days of delivery</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>We accept</h4>
+      <p class="footer-note">Cards · UPI · Netbanking · Cash on Delivery</p>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">Matchday Kits · Built for fans, by fans.</div>
+</footer>
+
+<div id="overlay"></div>
+<aside id="cart-drawer">
+  <div class="drawer-head">
+    <h2>Your Cart</h2>
+    <button id="close-cart">&times;</button>
+  </div>
+  <div id="cart-items"></div>
+  <div id="cart-footer">
+    <div class="coupon-row">
+      <input type="text" id="coupon-input" placeholder="Coupon code">
+      <button type="button" id="coupon-apply">Apply</button>
+    </div>
+    <div id="coupon-error"></div>
+    <div id="coupon-line" style="display:none"><span id="coupon-label"></span><span id="coupon-amount"></span></div>
+    <div id="cart-total"><span>Total</span><span id="cart-total-amount">₹0.00</span></div>
+    <button class="add-btn" id="checkout-btn">Proceed to checkout</button>
+  </div>
+  <form id="checkout-form">
+    <div id="checkout-error"></div>
+    <input type="text" id="cf-name" placeholder="Full name" required>
+    <input type="email" id="cf-email" placeholder="Email" required>
+    <input type="tel" id="cf-phone" placeholder="Phone number (10 digits)" required pattern="[0-9]{10}" maxlength="10">
+    <input type="text" id="cf-address1" placeholder="Address line 1 (house no., street)" required>
+    <input type="text" id="cf-address2" placeholder="Address line 2 (area, landmark) — optional">
+    <input type="text" id="cf-city" placeholder="City" required>
+    <input type="text" id="cf-state" placeholder="State" required>
+    <input type="text" id="cf-pincode" placeholder="PIN code (6 digits)" required pattern="[0-9]{6}" maxlength="6">
+    <div class="payment-choice">
+      <label><input type="radio" name="payment-method" value="online" checked> Pay online (Cards/UPI/Netbanking)</label>
+      <label><input type="radio" name="payment-method" value="cod"> Cash on Delivery</label>
+    </div>
+    <button type="submit" class="add-btn" id="pay-btn">Pay now</button>
+  </form>
+</aside>
+
+<script src="/js/store.js"></script>
+</body>
+</html>

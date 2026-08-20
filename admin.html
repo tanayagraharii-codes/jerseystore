@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Matchday Kits</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { padding-bottom: 60px; }
+  .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+  #login-box { max-width: 340px; margin: 100px auto; display: flex; flex-direction: column; gap: 10px; }
+  #login-box input {
+    background: var(--pitch); border: 1px solid var(--line); color: var(--chalk);
+    padding: 10px; border-radius: var(--radius);
+  }
+  #login-error { color: var(--danger); font-size: 13px; display: none; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+  .tabs button {
+    background: transparent; border: 1px solid var(--line); color: #B9C9C0;
+    padding: 8px 18px; border-radius: var(--radius); cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase;
+  }
+  .tabs button.active { border-color: var(--gold); color: var(--gold); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--line); }
+  th { font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase; color: #8ea296; }
+  .stock-input {
+    width: 50px; background: var(--pitch-deep); border: 1px solid var(--line); color: var(--chalk);
+    padding: 4px 6px; border-radius: 3px; font-family: 'IBM Plex Mono', monospace;
+  }
+  .badge { font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; }
+  .badge.pending { background: #4a3a20; color: #E3A93E; }
+  .badge.paid { background: #204a2f; color: #5fd88a; }
+  .badge.fulfilled { background: #1f3a35; color: #8ea296; }
+  .badge.cancelled { background: #4a2020; color: #d87a7a; }
+  .badge.cod { background: #2a3a4a; color: #7ab8e3; }
+  .small-btn {
+    background: var(--gold); color: var(--pitch-deep); border: none; padding: 6px 12px;
+    border-radius: 3px; font-size: 12px; cursor: pointer; font-weight: 600;
+  }
+  .small-btn:disabled { background: var(--line); color: #8ea296; cursor: not-allowed; }
+  #new-product-form { display: none; flex-direction: column; gap: 8px; max-width: 400px; margin-top: 20px; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius); }
+  #new-product-form.open { display: flex; }
+  #new-product-form input {
+    background: var(--pitch-deep); border: 1px solid var(--line); color: var(--chalk);
+    padding: 8px; border-radius: var(--radius);
+  }
+  #new-coupon-form { display: none; flex-direction: column; gap: 8px; max-width: 400px; margin-top: 20px; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius); }
+  #new-coupon-form.open { display: flex; }
+  #new-coupon-form input {
+    background: var(--pitch-deep); border: 1px solid var(--line); color: var(--chalk);
+    padding: 8px; border-radius: var(--radius);
+  }
+  #logout-btn { position: absolute; top: 20px; right: 24px; }
+</style>
+</head>
+<body>
+
+<div id="login-box">
+  <h2 style="font-family:'Anton',sans-serif; text-transform:uppercase; text-align:center;">Admin Login</h2>
+  <div id="login-error">Wrong password.</div>
+  <input type="password" id="login-password" placeholder="Admin password">
+  <button class="add-btn" id="login-btn">Log in</button>
+</div>
+
+<div class="admin-wrap" id="dashboard" style="display:none; position: relative;">
+  <button class="small-btn" id="logout-btn">Log out</button>
+  <h1 style="font-family:'Anton',sans-serif; text-transform:uppercase;">Dashboard</h1>
+
+  <div class="tabs">
+    <button data-tab="orders" class="active">Orders</button>
+    <button data-tab="inventory">Inventory</button>
+    <button data-tab="coupons">Coupons</button>
+  </div>
+
+  <div id="tab-orders">
+    <table>
+      <thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
+      <tbody id="orders-body"></tbody>
+    </table>
+  </div>
+
+  <div id="tab-inventory" style="display:none">
+    <table>
+      <thead><tr><th>Team</th><th>Product</th><th>Category</th><th>Price</th><th>S</th><th>M</th><th>L</th><th>XL</th><th></th></tr></thead>
+      <tbody id="products-body"></tbody>
+    </table>
+    <button class="small-btn" id="show-new-product" style="margin-top:16px;">+ Add product</button>
+    <form id="new-product-form">
+      <input id="np-team" placeholder="Team name" required>
+      <input id="np-name" placeholder="Product name (e.g. Home Kit 25/26)" required>
+      <select id="np-category" style="background:var(--pitch-deep);border:1px solid var(--line);color:var(--chalk);padding:8px;border-radius:var(--radius);">
+        <option value="new-season">New Season</option>
+        <option value="retro">Retro Jerseys</option>
+        <option value="customized">Customized</option>
+        <option value="sale">Clearance Sale</option>
+      </select>
+      <input id="np-price" type="number" step="0.01" placeholder="Price (INR)" required>
+      <input id="np-image" placeholder="Image URL">
+      <input id="np-s" type="number" placeholder="Stock — S" value="0">
+      <input id="np-m" type="number" placeholder="Stock — M" value="0">
+      <input id="np-l" type="number" placeholder="Stock — L" value="0">
+      <input id="np-xl" type="number" placeholder="Stock — XL" value="0">
+      <button class="add-btn" type="submit">Create product</button>
+    </form>
+  </div>
+
+  <div id="tab-coupons" style="display:none">
+    <table>
+      <thead><tr><th>Code</th><th>Discount</th><th>Min Order</th><th>Used</th><th>Status</th><th></th></tr></thead>
+      <tbody id="coupons-body"></tbody>
+    </table>
+    <button class="small-btn" id="show-new-coupon" style="margin-top:16px;">+ Add coupon</button>
+    <form id="new-coupon-form">
+      <input id="nc-code" placeholder="Code (e.g. WELCOME10)" required style="text-transform:uppercase;">
+      <select id="nc-type" style="background:var(--pitch-deep);border:1px solid var(--line);color:var(--chalk);padding:8px;border-radius:var(--radius);">
+        <option value="percent">Percentage off</option>
+        <option value="flat">Flat amount off (₹)</option>
+      </select>
+      <input id="nc-value" type="number" step="0.01" placeholder="Value (e.g. 10 for 10% or ₹10)" required>
+      <input id="nc-minorder" type="number" step="0.01" placeholder="Minimum order amount (optional)" value="0">
+      <input id="nc-limit" type="number" placeholder="Usage limit (optional, blank = unlimited)">
+      <button class="add-btn" type="submit">Create coupon</button>
+    </form>
+  </div>
+</div>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

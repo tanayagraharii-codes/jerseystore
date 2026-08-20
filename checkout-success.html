@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order confirmed — Matchday Kits</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .confirm-wrap { max-width: 520px; margin: 80px auto; text-align: center; padding: 0 24px; }
+  .confirm-wrap h1 { font-family: 'Anton', sans-serif; text-transform: uppercase; font-size: 32px; }
+  .confirm-wrap p { color: #B9C9C0; }
+  .confirm-wrap a { color: var(--gold); }
+</style>
+</head>
+<body>
+<header class="site"><div class="bar"><a href="/" class="wordmark">MATCHDAY<span>KITS</span></a></div></header>
+<div class="confirm-wrap">
+  <h1 id="status">Order confirmed!</h1>
+  <p id="detail"></p>
+  <p id="track-link" style="display:none"><a id="track-href">Track this order</a></p>
+  <p><a href="/">Back to shop</a></p>
+</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get('order');
+  const simulated = params.get('simulated');
+  const cod = params.get('cod');
+  const email = params.get('email');
+
+  if (orderId) {
+    if (cod) {
+      document.getElementById('detail').textContent = `Order ${orderId} confirmed — pay in cash when it's delivered. We'll be in touch about delivery timing.`;
+    } else {
+      document.getElementById('detail').textContent = simulated
+        ? `Order ${orderId} placed in TEST mode (no Razorpay keys configured yet — add them to process real payments).`
+        : `Order ${orderId} is paid. Thanks for your order!`;
+    }
+    if (email) {
+      document.getElementById('track-href').href = `/track-order.html?prefillOrder=${encodeURIComponent(orderId)}&prefillEmail=${encodeURIComponent(email)}`;
+      document.getElementById('track-link').style.display = 'block';
+    }
+  } else {
+    document.getElementById('status').textContent = 'No order reference found.';
+  }
+</script>
+</body>
+</html>
